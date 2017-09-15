@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import statsmodels.api as sm
 
-# Downloaded data from
+# Download data from
 # https://www.transtats.bts.gov/tables.asp?DB_ID=120
 #
 # Click the "download" link, then click the "pre-zipped file" button
@@ -28,7 +28,7 @@ print(m1.summary())
 m2 = sm.OLS.from_formula("I(np.log2(AirTime)) ~ I(np.log2(Distance))", dd).fit()
 print(m2.summary())
 
-# square root scale regression of duration on distance
+# Square root scale regression of duration on distance
 m3 = sm.OLS.from_formula("I(np.sqrt(AirTime)) ~ I(np.sqrt(Distance))", dd).fit()
 print(m3.summary())
 
@@ -82,9 +82,6 @@ for i in range(dm.shape[0]):
     j = np.argmax(dm.iloc[i,:].values)
     dmap[dm.columns[j]] = dm.index[i]
 
-
-#dd = df[["OriginAirportID", "DestAirportID"]].dropna()
-
 # Get the origin/destination cross-tab, then reorder so that rows and
 # columns are in 1-1 correspondence.
 dc = pd.crosstab(df.OriginAirportID, df.DestAirportID)
@@ -112,6 +109,9 @@ for k in range(5):
         u[:, k] *= -1
         v[:, k] *= -1
 na = dc.columns.tolist()
+
+for k in range(5):
+    print((u[:, k] * v[:, k] >= 0).mean())
 
 sv0 = pd.DataFrame({"origin": u[:, 0], "destination": v[:, 0]}, index=[dmap[x] for x in na])
 sv0 = sv0.sort_values(by="origin")
@@ -152,3 +152,11 @@ if np.sum(u < 0) > np.sum(u > 0):
 assert(np.max(np.abs(np.dot(dp.T, u) / u - 1)) < 1e-10)
 u /= u.sum()
 assert(np.max(np.abs(np.dot(u, dp) - u)) < 1e-10)
+
+
+dx = df.groupby(["UniqueCarrier", "TailNum"])["AirTime"].agg([np.sum, np.size])
+dx = dx.reset_index()
+dx = dx.groupby("UniqueCarrier").agg({"sum": np.mean, "size": np.sum})
+dx["sum"] /= 24
+dx = dx.rename(columns={"sum": "Hours", "size": "Flights"})
+dx = dx.sort_values(by="Hours")
