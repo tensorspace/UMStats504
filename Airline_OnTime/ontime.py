@@ -157,6 +157,6 @@ assert(np.max(np.abs(np.dot(u, dp) - u)) < 1e-10)
 dx = df.groupby(["UniqueCarrier", "TailNum"])["AirTime"].agg([np.sum, np.size])
 dx = dx.reset_index()
 dx = dx.groupby("UniqueCarrier").agg({"sum": np.mean, "size": np.sum})
-dx["sum"] /= 24
+dx["sum"] /= 60
 dx = dx.rename(columns={"sum": "Hours", "size": "Flights"})
 dx = dx.sort_values(by="Hours")
