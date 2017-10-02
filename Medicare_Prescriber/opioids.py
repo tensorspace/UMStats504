@@ -224,6 +224,24 @@ for k in range(1, 20):
 pa = pd.Series(coefs[:, 15], index=xnames)
 pa = pa[pa != 0]
 
+# Use lars to consider provider effects and state effects together
+y, x = patsy.dmatrices("log_op_z ~ 0 + log_nonop_z + C(provider_type) + C(state)", data=dr,
+                       return_type='dataframe')
+xa = np.asarray(x)
+ya = np.asarray(y)[:,0]
+xnames = x.columns.tolist()
+alphas, active, coefs = linear_model.lars_path(xa, ya, method='lars', verbose=True)
+
+# Display the first few variables selected by lars and the fitted
+# correlation.
+for k in range(1, 20):
+    print(xnames[active[k-1]])
+    f = np.dot(xa, coefs[:, k])
+    print(k, np.corrcoef(ya, f)[0, 1])
+
+pa = pd.Series(coefs[:, 15], index=xnames)
+pa = pa[pa != 0]
+
 # Merge procedure types
 du = db.groupby(["npi", "hcpcs_code"])["line_srvc_cnt"].agg(np.sum)
 du = du.unstack(fill_value=0)

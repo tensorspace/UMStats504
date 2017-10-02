@@ -1,3 +1,8 @@
+"""
+Create a map called dcat that maps drug categories to lists of drug
+names belonging to the category.
+"""
+
 import pandas as pd
 
 dc = pd.read_excel("PartD_Prescriber_PUF_NPI_15_Drug_Category_Lists.xlsx", sheetname=None)
