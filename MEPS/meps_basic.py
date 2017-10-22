@@ -4,7 +4,7 @@ import statsmodels.api as sm
 import patsy
 from read_meps import meps
 
-# Wstimated age x sex x race population totals
+# Estimated age x sex x race population totals
 ages = pd.cut(meps.AGE14X, np.arange(0, 90, 5))
 asx = pd.crosstab(ages, [meps.SEX, meps.RACEV2X], values=meps.PERWT14F, aggfunc=np.sum)
 print((asx / 1e6).to_string(float_format="%.2f"))
